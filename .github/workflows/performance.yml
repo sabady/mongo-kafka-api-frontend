@@ -295,19 +295,19 @@ jobs:
 
     steps:
     - name: Download load test results
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v5
       with:
         name: load-test-results
         path: ./load-test-results
 
     - name: Download stress test results
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v5
       with:
         name: stress-test-results
         path: ./stress-test-results
 
     - name: Download memory test results
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v5
       with:
         name: memory-test-results
         path: ./memory-test-results
