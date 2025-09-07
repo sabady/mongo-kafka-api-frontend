@@ -29,7 +29,7 @@ categorize_branches() {
     echo -e "${BLUE}📋 Categorizing branches...${NC}"
     
     # Docker updates
-    DOCKER_BRANCHES=($(git branch -r | grep "dependabot/docker" | sed 's/remotes\/origin\///'))
+    DOCKER_BRANCHES=($(git branch -r | grep "dependabot/docker" | sed 's/remotes\/origin\///' | grep -v "github_actions"))
     
     # GitHub Actions updates
     ACTIONS_BRANCHES=($(git branch -r | grep "dependabot/github_actions" | sed 's/remotes\/origin\///'))
@@ -51,7 +51,7 @@ show_branch_details() {
     echo -e "${PURPLE}📦 ${category}: ${branch}${NC}"
     
     # Get the commit message from the branch
-    local commit_msg=$(git log origin/main..origin/$branch --oneline | head -1)
+    local commit_msg=$(git log origin/main..origin/$branch --oneline | head -1 2>/dev/null || echo "No commits found")
     echo -e "   ${YELLOW}Commit: ${commit_msg}${NC}"
     
     # Check if there are conflicts
