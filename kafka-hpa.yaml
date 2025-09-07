@@ -11,7 +11,7 @@ spec:
     kind: Deployment
     name: kafka
   minReplicas: 1
-  maxReplicas: 3
+  maxReplicas: 1
   metrics:
   # CPU-based scaling
   - type: Resource
@@ -27,22 +27,6 @@ spec:
       target:
         type: Utilization
         averageUtilization: 85
-  # Custom metric: Kafka message throughput
-  - type: Pods
-    pods:
-      metric:
-        name: kafka_messages_per_second
-      target:
-        type: AverageValue
-        averageValue: "1000"
-  # Custom metric: Kafka partition count
-  - type: Pods
-    pods:
-      metric:
-        name: kafka_partition_count
-      target:
-        type: AverageValue
-        averageValue: "50"
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 600

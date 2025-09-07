@@ -22,7 +22,7 @@ data:
     kafka-topics --bootstrap-server kafka-service:9092 \
       --create \
       --topic user-events \
-      --partitions 3 \
+      --partitions 1 \
       --replication-factor 1 \
       --if-not-exists
     
@@ -30,7 +30,7 @@ data:
     kafka-topics --bootstrap-server kafka-service:9092 \
       --create \
       --topic product-events \
-      --partitions 3 \
+      --partitions 1 \
       --replication-factor 1 \
       --if-not-exists
     
@@ -38,7 +38,7 @@ data:
     kafka-topics --bootstrap-server kafka-service:9092 \
       --create \
       --topic order-events \
-      --partitions 3 \
+      --partitions 1 \
       --replication-factor 1 \
       --if-not-exists
     
@@ -46,7 +46,7 @@ data:
     kafka-topics --bootstrap-server kafka-service:9092 \
       --create \
       --topic api-events \
-      --partitions 3 \
+      --partitions 1 \
       --replication-factor 1 \
       --if-not-exists
     
@@ -54,7 +54,7 @@ data:
     kafka-topics --bootstrap-server kafka-service:9092 \
       --create \
       --topic audit-logs \
-      --partitions 3 \
+      --partitions 1 \
       --replication-factor 1 \
       --if-not-exists
     

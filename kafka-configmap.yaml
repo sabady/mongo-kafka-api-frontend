@@ -23,13 +23,9 @@ data:
     # limitations under the License.
 
     ############################# Server Basics #############################
-    process.roles=broker,controller
-    node.id=1
-    controller.quorum.voters=1@kafka-service:9093
-    listeners=PLAINTEXT://:9092,CONTROLLER://:9093
-    inter.broker.listener.name=PLAINTEXT
+    broker.id=1
+    listeners=PLAINTEXT://:9092
     advertised.listeners=PLAINTEXT://kafka-service:9092
-    controller.listener.names=CONTROLLER
     num.network.threads=3
     num.io.threads=8
     socket.send.buffer.bytes=102400
@@ -38,13 +34,13 @@ data:
 
     ############################# Log Basics #############################
     log.dirs=/var/lib/kafka/data
-    num.partitions=3
+    num.partitions=1
     num.recovery.threads.per.data.dir=1
+    auto.create.topics.enable=true
+    delete.topic.enable=true
 
     ############################# Internal Topic Settings  #############################
     offsets.topic.replication.factor=1
-    transaction.state.log.replication.factor=1
-    transaction.state.log.min.isr=1
 
     ############################# Log Flush Policy #############################
     log.flush.interval.messages=10000
@@ -56,8 +52,7 @@ data:
     log.retention.check.interval.ms=300000
 
     ############################# Zookeeper #############################
-    # Zookeeper connection string (not needed in KRaft mode)
-    # zookeeper.connect=localhost:2181
+    zookeeper.connect=localhost:2181
 
     ############################# Group Coordinator Settings #############################
     group.initial.rebalance.delay.ms=0
@@ -84,41 +79,18 @@ data:
     log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
     log4j.appender.stdout.layout.ConversionPattern=[%d] %p %m (%c)%n
 
-  kafka-storage.sh: |
+  kafka-setup.sh: |
     #!/bin/bash
-    # Licensed to the Apache Software Foundation (ASF) under one or more
-    # contributor license agreements.  See the NOTICE file distributed with
-    # this work for additional information regarding copyright ownership.
-    # The ASF licenses this file to You under the Apache License, Version 2.0
-    # (the "License"); you may not use this file except in compliance with
-    # the License.  You may obtain a copy of the License at
-    #
-    #    http://www.apache.org/licenses/LICENSE-2.0
-    #
-    # Unless required by applicable law or agreed to in writing, software
-    # distributed under the License is distributed on an "AS IS" BASIS,
-    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    # See the License for the specific language governing permissions and
-    # limitations under the License.
-
-    #!/bin/bash
-    # This script can be used to set up the proper directory structure for KRaft mode.
-    # It creates the necessary directories and sets the proper permissions.
-
+    # Simple Kafka setup script for single node
+    
     # Set the base directory
     KAFKA_LOG_DIRS=${KAFKA_LOG_DIRS:-/var/lib/kafka/data}
-
+    
     # Create the log directory if it doesn't exist
     mkdir -p $KAFKA_LOG_DIRS
-
+    
     # Set proper permissions
     chown -R kafka:kafka $KAFKA_LOG_DIRS
     chmod 755 $KAFKA_LOG_DIRS
-
-    # Format the storage if it's not already formatted
-    if [ ! -f "$KAFKA_LOG_DIRS/meta.properties" ]; then
-        echo "Formatting Kafka storage..."
-        /opt/kafka/bin/kafka-storage.sh format -t $(cat /opt/kafka/config/cluster-id) -c /opt/kafka/config/server.properties
-    fi
-
+    
     echo "Kafka storage setup complete"
