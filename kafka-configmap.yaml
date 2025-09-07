@@ -23,9 +23,13 @@ data:
     # limitations under the License.
 
     ############################# Server Basics #############################
-    broker.id=1
-    listeners=PLAINTEXT://:9092
+    process.roles=broker,controller
+    node.id=1
+    controller.quorum.voters=1@kafka-service:9093
+    listeners=PLAINTEXT://:9092,CONTROLLER://:9093
     advertised.listeners=PLAINTEXT://kafka-service:9092
+    controller.listener.names=CONTROLLER
+    inter.broker.listener.name=PLAINTEXT
     num.network.threads=3
     num.io.threads=8
     socket.send.buffer.bytes=102400
@@ -52,7 +56,8 @@ data:
     log.retention.check.interval.ms=300000
 
     ############################# Zookeeper #############################
-    zookeeper.connect=localhost:2181
+    # Zookeeper connection string (not needed in KRaft mode)
+    # zookeeper.connect=localhost:2181
 
     ############################# Group Coordinator Settings #############################
     group.initial.rebalance.delay.ms=0
@@ -81,7 +86,7 @@ data:
 
   kafka-setup.sh: |
     #!/bin/bash
-    # Simple Kafka setup script for single node
+    # Kafka setup script for KRaft mode single node
     
     # Set the base directory
     KAFKA_LOG_DIRS=${KAFKA_LOG_DIRS:-/var/lib/kafka/data}
@@ -92,5 +97,11 @@ data:
     # Set proper permissions
     chown -R kafka:kafka $KAFKA_LOG_DIRS
     chmod 755 $KAFKA_LOG_DIRS
+    
+    # Format the storage if it's not already formatted (KRaft mode)
+    if [ ! -f "$KAFKA_LOG_DIRS/meta.properties" ]; then
+        echo "Formatting Kafka storage for KRaft mode..."
+        /opt/kafka/bin/kafka-storage.sh format -t MkU3OEVBNTcwNTJENDM2Qk -c /opt/kafka/config/server.properties
+    fi
     
     echo "Kafka storage setup complete"
