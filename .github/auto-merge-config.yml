@@ -1,0 +1,140 @@
+# Auto-merge Configuration
+# This file defines the rules for automatic merging of PRs
+
+# Auto-merge rules for Dependabot PRs
+dependabot:
+  # Enable auto-merge for dependency updates
+  enabled: true
+  
+  # Conditions that must be met for auto-merge
+  conditions:
+    # All status checks must pass
+    status_checks: true
+    
+    # PR must be mergeable (no conflicts)
+    mergeable: true
+    
+    # PR must be up to date with base branch
+    up_to_date: true
+    
+    # PR must not be in draft state
+    not_draft: true
+    
+    # PR must not have requested changes
+    no_changes_requested: true
+  
+  # Merge strategy
+  merge_strategy: "squash"
+  
+  # Delete branch after merge
+  delete_branch: true
+  
+  # Auto-merge delay (in minutes) - gives time for final checks
+  delay_minutes: 5
+  
+  # Labels that enable auto-merge
+  auto_merge_labels:
+    - "auto-merge"
+    - "dependencies"
+  
+  # Labels that disable auto-merge
+  block_merge_labels:
+    - "do-not-merge"
+    - "needs-review"
+    - "breaking-change"
+
+# Auto-merge rules for regular PRs
+regular_prs:
+  # Enable auto-merge for regular PRs (more restrictive)
+  enabled: false
+  
+  # Conditions for regular PRs
+  conditions:
+    status_checks: true
+    mergeable: true
+    up_to_date: true
+    not_draft: true
+    approved: true  # Requires explicit approval
+    no_changes_requested: true
+  
+  # Merge strategy
+  merge_strategy: "merge"  # Preserve commit history for regular PRs
+  
+  # Delete branch after merge
+  delete_branch: true
+  
+  # Auto-merge delay
+  delay_minutes: 10
+
+# Notification settings
+notifications:
+  # Comment on PR when auto-merge is enabled
+  comment_on_enable: true
+  
+  # Comment on PR when auto-merge fails
+  comment_on_failure: true
+  
+  # Comment on PR when auto-merge succeeds
+  comment_on_success: true
+  
+  # Notify maintainers of auto-merge activity
+  notify_maintainers: false
+
+# Security settings
+security:
+  # Only auto-merge from trusted sources
+  trusted_authors:
+    - "dependabot[bot]"
+    - "sabady"
+  
+  # Block auto-merge for security-related changes
+  block_security_changes: true
+  
+  # Require security review for certain file types
+  security_review_required:
+    - "package.json"
+    - "package-lock.json"
+    - "yarn.lock"
+    - "Dockerfile"
+    - "*.yaml"
+    - "*.yml"
+
+# File-based rules
+file_rules:
+  # Auto-merge for documentation changes
+  documentation:
+    patterns:
+      - "*.md"
+      - "docs/**"
+    auto_merge: true
+    conditions:
+      status_checks: true
+      mergeable: true
+  
+  # Auto-merge for dependency updates
+  dependencies:
+    patterns:
+      - "package.json"
+      - "package-lock.json"
+      - "yarn.lock"
+      - "Dockerfile"
+    auto_merge: true
+    conditions:
+      status_checks: true
+      mergeable: true
+      author: "dependabot[bot]"
+  
+  # Require review for code changes
+  code:
+    patterns:
+      - "src/**"
+      - "*.ts"
+      - "*.js"
+      - "*.tsx"
+      - "*.jsx"
+    auto_merge: false
+    conditions:
+      status_checks: true
+      mergeable: true
+      approved: true
+      no_changes_requested: true

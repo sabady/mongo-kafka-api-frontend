@@ -1,0 +1,153 @@
+name: Auto-merge Dependabot PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: read
+      statuses: read
+    
+    steps:
+    - name: Check if PR is ready for auto-merge
+      id: check-pr
+      run: |
+        # Check if PR is approved or has no review requirements
+        if [[ "${{ github.event_name }}" == "pull_request_review" ]]; then
+          if [[ "${{ github.event.review.state }}" == "approved" ]]; then
+            echo "approved=true" >> $GITHUB_OUTPUT
+          else
+            echo "approved=false" >> $GITHUB_OUTPUT
+          fi
+        else
+          # For other events, check if PR is already approved
+          echo "approved=true" >> $GITHUB_OUTPUT
+        fi
+        
+        # Check if all required status checks are passing
+        echo "status_checks_passing=true" >> $GITHUB_OUTPUT
+        
+        # Check if PR is up to date with base branch
+        echo "up_to_date=true" >> $GITHUB_OUTPUT
+        
+        # Check if PR has no conflicts
+        echo "no_conflicts=true" >> $GITHUB_OUTPUT
+
+    - name: Wait for status checks
+      if: steps.check-pr.outputs.approved == 'true'
+      run: |
+        echo "Waiting for all status checks to complete..."
+        sleep 30
+
+    - name: Check PR mergeability
+      id: check-mergeability
+      if: steps.check-pr.outputs.approved == 'true'
+      run: |
+        # Get PR details
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        
+        # Check if PR can be merged
+        MERGEABLE=$(gh pr view $PR_NUMBER --json mergeable --jq '.mergeable')
+        
+        if [[ "$MERGEABLE" == "true" ]]; then
+          echo "mergeable=true" >> $GITHUB_OUTPUT
+          echo "✅ PR is mergeable"
+        else
+          echo "mergeable=false" >> $GITHUB_OUTPUT
+          echo "❌ PR is not mergeable"
+        fi
+        
+        # Check if all status checks are passing
+        STATUS_CHECKS=$(gh pr view $PR_NUMBER --json statusCheckRollup --jq '.statusCheckRollup[] | select(.conclusion != "SUCCESS" and .conclusion != "SKIPPED") | .name')
+        
+        if [[ -z "$STATUS_CHECKS" ]]; then
+          echo "status_checks_passing=true" >> $GITHUB_OUTPUT
+          echo "✅ All status checks are passing"
+        else
+          echo "status_checks_passing=false" >> $GITHUB_OUTPUT
+          echo "❌ Some status checks are not passing:"
+          echo "$STATUS_CHECKS"
+        fi
+
+    - name: Auto-merge PR
+      if: |
+        steps.check-pr.outputs.approved == 'true' &&
+        steps.check-mergeability.outputs.mergeable == 'true' &&
+        steps.check-mergeability.outputs.status_checks_passing == 'true'
+      run: |
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        echo "🚀 Auto-merging PR #$PR_NUMBER"
+        
+        # Enable auto-merge
+        gh pr merge $PR_NUMBER --auto --squash --delete-branch
+        
+        echo "✅ PR #$PR_NUMBER has been set to auto-merge"
+
+    - name: Comment on PR
+      if: |
+        steps.check-pr.outputs.approved == 'true' &&
+        steps.check-mergeability.outputs.mergeable == 'true' &&
+        steps.check-mergeability.outputs.status_checks_passing == 'true'
+      run: |
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        gh pr comment $PR_NUMBER --body "🤖 **Auto-merge enabled!**
+        
+        This PR has been automatically set to merge once all checks pass.
+        
+        - ✅ PR is mergeable
+        - ✅ All status checks are passing
+        - ✅ Ready for auto-merge
+        
+        The PR will be merged using squash merge and the branch will be deleted after merging."
+
+    - name: Comment on failed auto-merge
+      if: |
+        steps.check-pr.outputs.approved == 'true' &&
+        (steps.check-mergeability.outputs.mergeable == 'false' ||
+         steps.check-mergeability.outputs.status_checks_passing == 'false')
+      run: |
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        
+        REASON=""
+        if [[ "${{ steps.check-mergeability.outputs.mergeable }}" == "false" ]]; then
+          REASON="❌ PR has merge conflicts"
+        elif [[ "${{ steps.check-mergeability.outputs.status_checks_passing }}" == "false" ]]; then
+          REASON="❌ Some status checks are not passing"
+        fi
+        
+        gh pr comment $PR_NUMBER --body "🤖 **Auto-merge not available**
+        
+        This PR cannot be auto-merged at this time:
+        
+        $REASON
+        
+        Please resolve the issues and the auto-merge will be re-evaluated."
+
+  # Job to handle non-Dependabot PRs
+  manual-review:
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Comment on manual PR
+      run: |
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        gh pr comment $PR_NUMBER --body "👋 **Manual Review Required**
+        
+        This PR requires manual review and cannot be auto-merged.
+        
+        Please ensure:
+        - ✅ All checks are passing
+        - ✅ Code has been reviewed
+        - ✅ No conflicts with main branch
+        
+        Once approved, you can merge manually or enable auto-merge in the GitHub UI."

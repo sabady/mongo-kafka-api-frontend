@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/bin/bash
 
 # PR Status Script - Quick overview of all pending PRs
 

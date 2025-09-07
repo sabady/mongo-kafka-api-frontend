@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # Backend dependencies
+  # Enable version updates for npm (backend)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -9,17 +9,56 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 10
     reviewers:
-      - "backend-team"
+      - "sabady"
     assignees:
-      - "backend-team"
+      - "sabady"
     commit-message:
       prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
-      - "backend"
+      - "auto-merge"
+    # Auto-merge settings
+    pull-request-branch-name:
+      separator: "/"
+    # Group updates by dependency type
+    groups:
+      # Group all TypeScript-related updates
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/*"
+          - "ts-*"
+      # Group all testing-related updates
+      testing:
+        patterns:
+          - "jest"
+          - "@types/jest"
+          - "supertest"
+          - "@types/supertest"
+          - "testcontainers"
+          - "mongodb-memory-server"
+      # Group all security-related updates
+      security:
+        patterns:
+          - "helmet"
+          - "cors"
+          - "express-rate-limit"
+      # Group all Kafka-related updates
+      kafka:
+        patterns:
+          - "kafkajs"
+      # Group all MongoDB-related updates
+      mongodb:
+        patterns:
+          - "mongoose"
+      # Group all monitoring-related updates
+      monitoring:
+        patterns:
+          - "prom-client"
+          - "@types/prom-client"
 
-  # Frontend dependencies
+  # Enable version updates for npm (frontend)
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
@@ -28,17 +67,43 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 10
     reviewers:
-      - "frontend-team"
+      - "sabady"
     assignees:
-      - "frontend-team"
+      - "sabady"
     commit-message:
       prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
       - "frontend"
+      - "auto-merge"
+    # Group updates by dependency type
+    groups:
+      # Group all React-related updates
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      # Group all Material-UI updates
+      material-ui:
+        patterns:
+          - "@mui/*"
+          - "@material-ui/*"
+      # Group all frontend testing updates
+      frontend-testing:
+        patterns:
+          - "@testing-library/*"
+          - "web-vitals"
+      # Group all frontend utilities
+      frontend-utils:
+        patterns:
+          - "axios"
+          - "uuid"
+          - "@types/uuid"
 
-  # Docker dependencies
+  # Enable version updates for Docker
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
@@ -47,17 +112,32 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 5
     reviewers:
-      - "devops-team"
+      - "sabady"
     assignees:
-      - "devops-team"
+      - "sabady"
     commit-message:
       prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
       - "docker"
+      - "auto-merge"
+    # Group Docker updates
+    groups:
+      # Group all base image updates
+      base-images:
+        patterns:
+          - "node"
+          - "alpine"
+      # Group all service updates
+      services:
+        patterns:
+          - "mongo"
+          - "kafka"
+          - "prometheus"
+          - "metrics-server"
 
-  # GitHub Actions
+  # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -66,12 +146,32 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 5
     reviewers:
-      - "devops-team"
+      - "sabady"
     assignees:
-      - "devops-team"
+      - "sabady"
     commit-message:
       prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
       - "github-actions"
+      - "auto-merge"
+    # Group GitHub Actions updates
+    groups:
+      # Group all Node.js setup actions
+      node-actions:
+        patterns:
+          - "actions/setup-node"
+      # Group all Docker actions
+      docker-actions:
+        patterns:
+          - "docker/*"
+      # Group all artifact actions
+      artifact-actions:
+        patterns:
+          - "actions/upload-artifact"
+          - "actions/download-artifact"
+      # Group all Kubernetes actions
+      k8s-actions:
+        patterns:
+          - "azure/setup-kubectl"
