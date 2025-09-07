@@ -1,0 +1,39 @@
+# Global code owners - these users will be requested for review on all changes
+* @sabady
+
+# API Server specific files
+/api-server/ @sabady
+/src/ @sabady
+/package.json @sabady
+/tsconfig.json @sabady
+/Dockerfile @sabady
+
+# Frontend specific files
+/frontend/ @sabady
+
+# Kubernetes manifests
+*.yaml @sabady
+*.yml @sabady
+
+# CI/CD and workflows
+/.github/ @sabady
+
+# Documentation
+*.md @sabady
+/README* @sabady
+
+# Configuration files
+*.json @sabady
+*.js @sabady
+*.ts @sabady
+*.sh @sabady
+
+# Docker and deployment
+Dockerfile* @sabady
+docker-compose* @sabady
+.dockerignore @sabady
+
+# Environment and secrets
+.env* @sabady
+*secret* @sabady
+*config* @sabady
