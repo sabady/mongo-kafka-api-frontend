@@ -11,4 +11,4 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  storageClassName: "local-path"  # Use local-path storage class for Minikube
+  storageClassName: "standard"  # Use standard storage class for Minikube

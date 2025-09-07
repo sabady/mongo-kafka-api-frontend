@@ -45,7 +45,17 @@ choco install minikube kubectl docker-desktop
 
 ## 🚀 Quick Start
 
-### 1. Start the Complete Stack
+### 1. Fix Docker Permissions (If Needed)
+```bash
+./fix-docker-permissions.sh
+```
+
+### 2. Test Minikube Setup (Optional)
+```bash
+./test-minikube.sh
+```
+
+### 3. Start the Complete Stack
 ```bash
 ./run-local-minikube.sh
 ```
@@ -179,8 +189,27 @@ kubectl describe hpa api-server-hpa
 
 ### Common Issues
 
+#### Docker Permissions Issues
+```bash
+# Fix Docker permissions
+./fix-docker-permissions.sh
+
+# Or manually:
+sudo usermod -aG docker $USER
+# Then log out and log back in
+
+# Test Docker permissions
+docker ps
+
+# Check if user is in docker group
+groups $USER
+```
+
 #### Minikube Won't Start
 ```bash
+# Test Minikube setup
+./test-minikube.sh
+
 # Check Docker status
 sudo systemctl status docker
 
@@ -189,6 +218,13 @@ sudo systemctl restart docker
 
 # Start Minikube with more resources
 minikube start --memory=6144 --cpus=3
+
+# Check Minikube logs
+minikube logs
+
+# Delete and recreate Minikube
+minikube delete
+minikube start --memory=4096 --cpus=2 --driver=docker
 ```
 
 #### Services Not Ready

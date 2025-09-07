@@ -17,11 +17,87 @@ if ! command -v kubectl &> /dev/null; then
     exit 1
 fi
 
-echo "✅ Minikube and kubectl are available"
+# Check if Docker is available and accessible
+if ! command -v docker &> /dev/null; then
+    echo "❌ Docker is not installed or not in PATH"
+    echo "Please install Docker: https://docs.docker.com/get-docker/"
+    exit 1
+fi
 
-# Start Minikube
-echo "🚀 Starting Minikube..."
-minikube start --memory=4096 --cpus=2 --driver=docker
+# Check Docker permissions
+if ! docker ps &> /dev/null; then
+    echo "❌ Docker permissions issue detected"
+    echo "💡 Run the following to fix Docker permissions:"
+    echo "   ./fix-docker-permissions.sh"
+    echo ""
+    echo "Or manually:"
+    echo "   sudo usermod -aG docker \$USER"
+    echo "   # Then log out and log back in"
+    exit 1
+fi
+
+echo "✅ Minikube, kubectl, and Docker are available"
+
+# Check if Minikube is already running
+if minikube status | grep -q "Running"; then
+    echo "✅ Minikube is already running"
+    echo "📋 Current Minikube status:"
+    minikube status
+else
+    # Function to start Minikube with retries
+    start_minikube() {
+        local max_attempts=3
+        local attempt=1
+        
+        while [ $attempt -le $max_attempts ]; do
+            echo "🚀 Starting Minikube (attempt $attempt/$max_attempts)..."
+            
+            if minikube start --memory=4096 --cpus=2 --driver=docker; then
+                echo "✅ Minikube started successfully"
+                return 0
+            else
+                echo "❌ Minikube start failed (attempt $attempt/$max_attempts)"
+                if [ $attempt -lt $max_attempts ]; then
+                    echo "🔄 Retrying in 10 seconds..."
+                    sleep 10
+                fi
+                attempt=$((attempt + 1))
+            fi
+        done
+        
+        echo "❌ Failed to start Minikube after $max_attempts attempts"
+        return 1
+    }
+    
+    # Start Minikube
+    start_minikube
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
+fi
+
+# Wait for Minikube to be ready
+echo "⏳ Waiting for Minikube to be ready..."
+minikube status
+
+# Check if Minikube is running
+if ! minikube status | grep -q "Running"; then
+    echo "❌ Minikube failed to start properly"
+    echo "📋 Minikube status:"
+    minikube status
+    exit 1
+fi
+
+echo "✅ Minikube is running"
+
+# Wait for cluster to be ready
+echo "⏳ Waiting for cluster to be ready..."
+kubectl wait --for=condition=Ready nodes --all --timeout=300s
+if [ $? -eq 0 ]; then
+    echo "✅ Cluster is ready"
+else
+    echo "⚠️ Cluster readiness check timed out, but continuing..."
+fi
 
 # Enable required addons
 echo "🔧 Enabling Minikube addons..."
@@ -30,9 +106,24 @@ minikube addons enable ingress
 minikube addons enable dashboard
 minikube addons enable storage-provisioner
 
+# Wait for addons to be ready
+echo "⏳ Waiting for addons to be ready..."
+sleep 10
+
 # Set up Docker environment for Minikube
 echo "🐳 Setting up Docker environment for Minikube..."
 eval $(minikube docker-env)
+
+# Verify kubectl can connect to the cluster
+echo "🔍 Verifying kubectl connection..."
+if ! kubectl cluster-info &> /dev/null; then
+    echo "❌ kubectl cannot connect to the cluster"
+    echo "📋 Cluster info:"
+    kubectl cluster-info
+    exit 1
+fi
+
+echo "✅ kubectl is connected to the cluster"
 
 # Verify storage class is available
 echo "💾 Verifying storage class..."
