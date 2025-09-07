@@ -15,7 +15,7 @@
     "axios": "^1.6.2",
     "kafkajs": "^2.2.4",
     "uuid": "^9.0.1",
-    "@mui/material": "^5.15.0",
+    "@mui/material": "^7.3.2",
     "@mui/icons-material": "^5.15.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0"
