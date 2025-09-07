@@ -14,7 +14,7 @@ spec:
       restartPolicy: OnFailure
       containers:
       - name: kafka-topic-creator
-        image: confluentinc/cp-kafka:7.4.0
+        image: confluentinc/cp-kafka:8.0.0
         command: ["/bin/bash"]
         args: ["/scripts/create-topics.sh"]
         volumeMounts:
