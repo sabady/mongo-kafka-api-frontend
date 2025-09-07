@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-topics
+  namespace: default
+  labels:
+    app: kafka
+data:
+  create-topics.sh: |
+    #!/bin/bash
+    
+    # Wait for Kafka to be ready
+    echo "Waiting for Kafka to be ready..."
+    until kafka-topics --bootstrap-server kafka-service:9092 --list; do
+      echo "Kafka is not ready yet. Waiting..."
+      sleep 5
+    done
+    
+    echo "Kafka is ready. Creating topics..."
+    
+    # Create user events topic
+    kafka-topics --bootstrap-server kafka-service:9092 \
+      --create \
+      --topic user-events \
+      --partitions 3 \
+      --replication-factor 1 \
+      --if-not-exists
+    
+    # Create product events topic
+    kafka-topics --bootstrap-server kafka-service:9092 \
+      --create \
+      --topic product-events \
+      --partitions 3 \
+      --replication-factor 1 \
+      --if-not-exists
+    
+    # Create order events topic
+    kafka-topics --bootstrap-server kafka-service:9092 \
+      --create \
+      --topic order-events \
+      --partitions 3 \
+      --replication-factor 1 \
+      --if-not-exists
+    
+    # Create API events topic
+    kafka-topics --bootstrap-server kafka-service:9092 \
+      --create \
+      --topic api-events \
+      --partitions 3 \
+      --replication-factor 1 \
+      --if-not-exists
+    
+    # Create audit log topic
+    kafka-topics --bootstrap-server kafka-service:9092 \
+      --create \
+      --topic audit-logs \
+      --partitions 3 \
+      --replication-factor 1 \
+      --if-not-exists
+    
+    echo "Topics created successfully!"
+    
+    # List all topics
+    echo "Available topics:"
+    kafka-topics --bootstrap-server kafka-service:9092 --list

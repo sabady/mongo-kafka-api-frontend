@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-topic-creator
+  namespace: default
+  labels:
+    app: kafka
+spec:
+  template:
+    metadata:
+      labels:
+        app: kafka-topic-creator
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: kafka-topic-creator
+        image: confluentinc/cp-kafka:7.4.0
+        command: ["/bin/bash"]
+        args: ["/scripts/create-topics.sh"]
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+        env:
+        - name: KAFKA_OPTS
+          value: "-Djava.security.auth.login.config=/opt/kafka/config/kafka_client_jaas.conf"
+      volumes:
+      - name: scripts
+        configMap:
+          name: kafka-topics
+          defaultMode: 0755
