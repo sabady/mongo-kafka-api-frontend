@@ -103,6 +103,32 @@ A comprehensive Node.js TypeScript API server that provides CRUD operations for 
 - Docker (optional)
 - Kubernetes cluster (optional)
 
+### Local Development with Minikube
+For local development and testing, use Minikube:
+
+```bash
+# Start the complete stack locally
+./run-local-minikube.sh
+
+# Stop the local environment
+./stop-local-minikube.sh
+```
+
+This will:
+- Start Minikube with 4GB RAM and 2 CPUs
+- Build Docker images for all services
+- Deploy the complete stack with monitoring
+- Provide access URLs for all services
+
+**Access URLs:**
+- Frontend: `http://192.168.49.2:30080`
+- API Server: `http://192.168.49.2:30080/api`
+- Health Check: `http://192.168.49.2:30080/health`
+- Prometheus: `http://192.168.49.2:30090`
+- Minikube Dashboard: `minikube dashboard`
+
+See [README-LOCAL.md](README-LOCAL.md) for detailed local development instructions.
+
 ### Local Development
 
 1. **Install dependencies:**

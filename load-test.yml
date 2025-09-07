@@ -1,0 +1,46 @@
+config:
+  target: 'http://192.168.49.2:30080'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 50
+      name: "Ramp up load"
+    - duration: 300
+      arrivalRate: 100
+      name: "Sustained load"
+    - duration: 60
+      arrivalRate: 200
+      name: "Spike test"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: "Health check"
+    weight: 20
+    flow:
+      - get:
+          url: "/health"
+
+  - name: "API endpoints"
+    weight: 80
+    flow:
+      - get:
+          url: "/api/users"
+      - post:
+          url: "/api/users"
+          json:
+            name: "Load Test User {{ $randomString() }}"
+            email: "loadtest{{ $randomString() }}@example.com"
+      - get:
+          url: "/api/products"
+      - post:
+          url: "/api/products"
+          json:
+            name: "Load Test Product {{ $randomString() }}"
+            description: "A product for load testing"
+            price: 99.99
+            category: "electronics"
+            quantity: 100
