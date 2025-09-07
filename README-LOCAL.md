@@ -50,6 +50,12 @@ choco install minikube kubectl docker-desktop
 ./run-local-minikube.sh
 ```
 
+**Note**: The script automatically configures the `local-path` storage class for persistent volumes. If you encounter storage issues, you can manually set it up:
+
+```bash
+./setup-storage.sh
+```
+
 This script will:
 - Start Minikube with 4GB RAM and 2 CPUs
 - Enable required addons (metrics-server, ingress, dashboard)
@@ -206,6 +212,25 @@ minikube service frontend-service-nodeport --url
 # Port forward for direct access
 kubectl port-forward service/api-server-service 3000:3000
 kubectl port-forward service/frontend-service 3001:80
+```
+
+#### Storage Issues
+```bash
+# Check storage classes
+kubectl get storageclass
+
+# Check PVC status
+kubectl get pvc
+
+# Check PV status
+kubectl get pv
+
+# Setup local-path storage class
+./setup-storage.sh
+
+# Check PVC details
+kubectl describe pvc mongodb-pvc
+kubectl describe pvc kafka-pvc
 ```
 
 ### Reset Everything

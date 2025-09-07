@@ -28,10 +28,20 @@ echo "🔧 Enabling Minikube addons..."
 minikube addons enable metrics-server
 minikube addons enable ingress
 minikube addons enable dashboard
+minikube addons enable storage-provisioner
 
 # Set up Docker environment for Minikube
 echo "🐳 Setting up Docker environment for Minikube..."
 eval $(minikube docker-env)
+
+# Verify storage class is available
+echo "💾 Verifying storage class..."
+kubectl get storageclass
+if ! kubectl get storageclass local-path &> /dev/null; then
+    echo "⚠️ local-path storage class not found, but continuing..."
+else
+    echo "✅ local-path storage class is available"
+fi
 
 # Build Docker images
 echo "🔨 Building Docker images..."
