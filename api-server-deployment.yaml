@@ -6,7 +6,7 @@ metadata:
   labels:
     app: api-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: api-server
@@ -21,8 +21,6 @@ spec:
         ports:
         - containerPort: 3000
           name: http
-        - containerPort: 9090
-          name: metrics
         env:
         - name: NODE_ENV
           value: "production"
@@ -73,7 +71,3 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 10
-        annotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "3000"
-          prometheus.io/path: "/metrics"

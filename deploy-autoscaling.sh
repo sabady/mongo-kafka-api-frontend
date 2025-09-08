@@ -38,47 +38,7 @@ else
     exit 1
 fi
 
-# Deploy Prometheus
-echo "📈 Deploying Prometheus..."
-kubectl apply -f prometheus-server.yaml
-if [ $? -eq 0 ]; then
-    echo "✅ Prometheus deployed"
-else
-    echo "❌ Failed to deploy Prometheus"
-    exit 1
-fi
 
-# Wait for Prometheus to be ready
-echo "⏳ Waiting for Prometheus to be ready..."
-kubectl wait --for=condition=available --timeout=300s deployment/prometheus
-
-if [ $? -eq 0 ]; then
-    echo "✅ Prometheus is ready!"
-else
-    echo "❌ Prometheus failed to become ready within 5 minutes"
-    exit 1
-fi
-
-# Deploy Custom Metrics Server
-echo "📊 Deploying Custom Metrics Server..."
-kubectl apply -f custom-metrics-server.yaml
-if [ $? -eq 0 ]; then
-    echo "✅ Custom Metrics Server deployed"
-else
-    echo "❌ Failed to deploy Custom Metrics Server"
-    exit 1
-fi
-
-# Wait for custom metrics server to be ready
-echo "⏳ Waiting for Custom Metrics Server to be ready..."
-kubectl wait --for=condition=available --timeout=300s deployment/custom-metrics-server
-
-if [ $? -eq 0 ]; then
-    echo "✅ Custom Metrics Server is ready!"
-else
-    echo "❌ Custom Metrics Server failed to become ready within 5 minutes"
-    exit 1
-fi
 
 # Deploy Horizontal Pod Autoscalers
 echo "📈 Deploying Horizontal Pod Autoscalers..."
@@ -139,19 +99,12 @@ kubectl get vpa 2>/dev/null || echo "VPA not available"
 echo "📋 Metrics Server Status:"
 kubectl get pods -n kube-system -l k8s-app=metrics-server
 
-echo "📋 Prometheus Status:"
-kubectl get pods -l app=prometheus
-
-echo "📋 Custom Metrics Server Status:"
-kubectl get pods -l app=custom-metrics-server
 
 echo ""
 echo "🎉 Autoscaling deployment completed successfully!"
 echo ""
 echo "📡 Access Information:"
-echo "  - Prometheus: http://<node-ip>:30090"
 echo "  - Metrics API: kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes"
-echo "  - Custom Metrics API: kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1"
 echo ""
 echo "🔍 To check autoscaling status:"
 echo "  kubectl get hpa"
@@ -167,4 +120,3 @@ echo "🧪 To test autoscaling:"
 echo "  1. Generate load on your services"
 echo "  2. Monitor HPA status: kubectl get hpa -w"
 echo "  3. Check pod scaling: kubectl get pods -w"
-echo "  4. View metrics in Prometheus: http://<node-ip>:30090"
