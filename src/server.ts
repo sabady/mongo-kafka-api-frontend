@@ -5,7 +5,6 @@ import compression from 'compression';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
-import { createPrometheusMetrics } from './utils/metrics';
 
 import Database from './config/database';
 import KafkaConsumerService from './services/kafkaConsumer';
@@ -16,20 +15,18 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const NODE_ENV = process.env.NODE_ENV || 'development';
+const PORT = process.env['PORT'] || 3000;
+const NODE_ENV = process.env['NODE_ENV'] || 'development';
 
 // Initialize database and Kafka consumer
 const database = Database.getInstance();
 const kafkaConsumer = new KafkaConsumerService();
 
-// Initialize Prometheus metrics
-const metricsRegister = createPrometheusMetrics();
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.API_RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
-  max: parseInt(process.env.API_RATE_LIMIT_MAX_REQUESTS || '100'), // limit each IP to 100 requests per windowMs
+  windowMs: parseInt(process.env['API_RATE_LIMIT_WINDOW_MS'] || '900000'), // 15 minutes
+  max: parseInt(process.env['API_RATE_LIMIT_MAX_REQUESTS'] || '100'), // limit each IP to 100 requests per windowMs
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.'
@@ -43,7 +40,7 @@ app.use(helmet()); // Security headers
 app.use(compression()); // Compress responses
 app.use(limiter); // Rate limiting
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: process.env['CORS_ORIGIN'] || '*',
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -80,11 +77,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Metrics endpoint
-app.get('/metrics', (req, res) => {
-  res.set('Content-Type', metricsRegister.contentType);
-  res.end(metricsRegister.metrics());
-});
 
 // API routes
 app.use('/api', apiRoutes);

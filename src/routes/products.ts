@@ -153,7 +153,7 @@ router.patch('/:id/stock', validateObjectId, validateRequiredFields(['quantity']
     throw new AppError('Product not found', 404);
   }
 
-  await product.updateStock(quantity);
+  await (product as any).updateStock(quantity);
 
   const response: ApiResponse = {
     success: true,
@@ -167,7 +167,7 @@ router.patch('/:id/stock', validateObjectId, validateRequiredFields(['quantity']
 // GET /api/products/category/:category - Get products by category
 router.get('/category/:category', asyncHandler(async (req: Request, res: Response) => {
   const { category } = req.params;
-  const products = await Product.findByCategory(category);
+  const products = await (Product as any).findByCategory(category);
 
   const response: ApiResponse = {
     success: true,
@@ -180,7 +180,7 @@ router.get('/category/:category', asyncHandler(async (req: Request, res: Respons
 
 // GET /api/products/available - Get available products only
 router.get('/available', asyncHandler(async (req: Request, res: Response) => {
-  const availableProducts = await Product.findAvailable();
+  const availableProducts = await (Product as any).findAvailable();
 
   const response: ApiResponse = {
     success: true,
@@ -194,7 +194,7 @@ router.get('/available', asyncHandler(async (req: Request, res: Response) => {
 // GET /api/products/search/:term - Search products by text
 router.get('/search/:term', asyncHandler(async (req: Request, res: Response) => {
   const { term } = req.params;
-  const products = await Product.searchProducts(term);
+  const products = await (Product as any).searchProducts(term);
 
   const response: ApiResponse = {
     success: true,

@@ -3,8 +3,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://admin:admin123@mongodb-service:27017/admin?authSource=admin';
-const MONGODB_DATABASE = process.env.MONGODB_DATABASE || 'api_db';
+const MONGODB_URI = process.env['MONGODB_URI'] || 'mongodb://admin:admin123@mongodb-service:27017/admin?authSource=admin';
+const MONGODB_DATABASE = process.env['MONGODB_DATABASE'] || 'api_db';
 
 class Database {
   private static instance: Database;
@@ -32,7 +32,6 @@ class Database {
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,
         bufferCommands: false,
-        bufferMaxEntries: 0,
         dbName: MONGODB_DATABASE,
       };
 

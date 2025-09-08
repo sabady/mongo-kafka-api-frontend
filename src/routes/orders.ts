@@ -90,7 +90,7 @@ router.post('/', validateRequiredFields(['userId', 'products', 'shippingAddress'
   // Check stock availability and calculate total
   let totalAmount = 0;
   for (const orderProduct of products) {
-    const dbProduct = dbProducts.find(p => p._id.toString() === orderProduct.productId);
+    const dbProduct = dbProducts.find(p => (p._id as any).toString() === orderProduct.productId);
     if (!dbProduct) {
       throw new AppError(`Product ${orderProduct.productId} not found`, 404);
     }
@@ -106,7 +106,7 @@ router.post('/', validateRequiredFields(['userId', 'products', 'shippingAddress'
     products: products.map((p: any) => ({
       productId: p.productId,
       quantity: p.quantity,
-      price: dbProducts.find(dp => dp._id.toString() === p.productId)?.price || 0
+      price: dbProducts.find(dp => (dp._id as any).toString() === p.productId)?.price || 0
     })),
     totalAmount,
     shippingAddress
@@ -116,9 +116,9 @@ router.post('/', validateRequiredFields(['userId', 'products', 'shippingAddress'
 
   // Update product stock
   for (const orderProduct of products) {
-    const dbProduct = dbProducts.find(p => p._id.toString() === orderProduct.productId);
+    const dbProduct = dbProducts.find(p => (p._id as any).toString() === orderProduct.productId);
     if (dbProduct) {
-      await dbProduct.updateStock(dbProduct.quantity - orderProduct.quantity);
+      await (dbProduct as any).updateStock(dbProduct.quantity - orderProduct.quantity);
     }
   }
 
@@ -180,7 +180,7 @@ router.patch('/:id/status', validateObjectId, validateRequiredFields(['status'])
     throw new AppError('Order not found', 404);
   }
 
-  await order.updateStatus(status);
+  await (order as any).updateStatus(status);
 
   const response: ApiResponse = {
     success: true,
@@ -198,13 +198,13 @@ router.patch('/:id/cancel', validateObjectId, asyncHandler(async (req: Request, 
     throw new AppError('Order not found', 404);
   }
 
-  await order.cancel();
+  await (order as any).cancel();
 
   // Restore product stock
   for (const orderProduct of order.products) {
     const product = await Product.findById(orderProduct.productId);
     if (product) {
-      await product.updateStock(product.quantity + orderProduct.quantity);
+      await (product as any).updateStock(product.quantity + orderProduct.quantity);
     }
   }
 
@@ -220,7 +220,7 @@ router.patch('/:id/cancel', validateObjectId, asyncHandler(async (req: Request, 
 // GET /api/orders/user/:userId - Get orders by user
 router.get('/user/:userId', asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.params;
-  const orders = await Order.findByUser(userId);
+  const orders = await (Order as any).findByUser(userId);
 
   const response: ApiResponse = {
     success: true,
@@ -234,7 +234,7 @@ router.get('/user/:userId', asyncHandler(async (req: Request, res: Response) => 
 // GET /api/orders/status/:status - Get orders by status
 router.get('/status/:status', asyncHandler(async (req: Request, res: Response) => {
   const { status } = req.params;
-  const orders = await Order.findByStatus(status);
+  const orders = await (Order as any).findByStatus(status);
 
   const response: ApiResponse = {
     success: true,
@@ -247,7 +247,7 @@ router.get('/status/:status', asyncHandler(async (req: Request, res: Response) =
 
 // GET /api/orders/stats - Get order statistics
 router.get('/stats', asyncHandler(async (req: Request, res: Response) => {
-  const stats = await Order.getOrderStats();
+  const stats = await (Order as any).getOrderStats();
 
   const response: ApiResponse = {
     success: true,

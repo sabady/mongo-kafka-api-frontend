@@ -158,7 +158,7 @@ router.patch('/:id/deactivate', validateObjectId, asyncHandler(async (req: Reque
     throw new AppError('User not found', 404);
   }
 
-  await user.deactivate();
+  await (user as any).deactivate();
 
   const response: ApiResponse = {
     success: true,
@@ -171,7 +171,7 @@ router.patch('/:id/deactivate', validateObjectId, asyncHandler(async (req: Reque
 
 // GET /api/users/active - Get active users only
 router.get('/active', asyncHandler(async (req: Request, res: Response) => {
-  const activeUsers = await User.findActiveUsers();
+  const activeUsers = await (User as any).findActiveUsers();
 
   const response: ApiResponse = {
     success: true,

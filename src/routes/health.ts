@@ -41,13 +41,13 @@ router.get('/detailed', asyncHandler(async (req: Request, res: Response) => {
   const dbInfo = db.getConnectionInfo();
 
   // Test database operations
-  let dbTest = { status: 'unknown', error: null };
+  let dbTest: { status: string; error: string | null } = { status: 'unknown', error: null };
   try {
     const { User } = await import('../models');
     await User.findOne().limit(1);
     dbTest = { status: 'healthy', error: null };
   } catch (error) {
-    dbTest = { status: 'unhealthy', error: (error as Error).message };
+    dbTest = { status: 'unhealthy', error: (error as Error).message || 'Unknown error' };
   }
 
   const detailedHealth = {

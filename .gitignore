@@ -99,6 +99,7 @@ Thumbs.db
 
 # Docker
 .dockerignore
+.docker-hub-token
 
 # Kubernetes
 *.kubeconfig

@@ -35,12 +35,10 @@ class KafkaService {
   private consumer: Consumer | null = null;
   private producer: Producer | null = null;
   private isConnected: boolean = false;
-  private eventHandlers: Map<string, (event: KafkaEvent) => Promise<void>> = new Map();
-
   private constructor() {
     const kafkaConfig = {
-      clientId: process.env.KAFKA_CLIENT_ID || 'api-server',
-      brokers: [process.env.KAFKA_BROKERS || 'kafka-service:9092'],
+      clientId: process.env['KAFKA_CLIENT_ID'] || 'api-server',
+      brokers: [process.env['KAFKA_BROKERS'] || 'kafka-service:9092'],
       retry: {
         initialRetryTime: 100,
         retries: 8
@@ -234,8 +232,8 @@ class KafkaService {
   public getConnectionInfo() {
     return {
       isConnected: this.isConnected,
-      clientId: this.kafka.options.clientId,
-      brokers: this.kafka.options.brokers
+      clientId: (this.kafka as any).options?.clientId || 'unknown',
+      brokers: (this.kafka as any).options?.brokers || []
     };
   }
 }

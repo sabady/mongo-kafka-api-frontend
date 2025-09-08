@@ -315,7 +315,7 @@ const CustomerInterface: React.FC = () => {
           ) : (
             <List>
               {boughtItems.map((item, index) => (
-                <React.Fragment key={item.id}>
+                <React.Fragment key={index}>
                   <ListItem>
                     <ListItemText
                       primary={item.name}

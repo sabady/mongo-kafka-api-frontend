@@ -4,17 +4,26 @@ FROM node:18-alpine as build
 # Set working directory
 WORKDIR /app
 
+# Install dependencies for native modules
+RUN apk add --no-cache python3 make g++
+
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (including dev dependencies for build)
+RUN npm install --legacy-peer-deps && npm cache clean --force
 
 # Copy source code
 COPY . .
 
+# Clear npm cache and reinstall if needed
+RUN npm cache clean --force
+
 # Build the application
-RUN npm run build
+RUN NODE_OPTIONS="--openssl-legacy-provider" npm run build
+
+# Verify build was successful
+RUN ls -la build/ || (echo "Build failed - no build directory found" && exit 1)
 
 # Production stage with nginx
 FROM nginx:alpine
