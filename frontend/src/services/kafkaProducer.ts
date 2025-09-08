@@ -10,7 +10,7 @@ class KafkaProducerService {
   constructor() {
     this.kafka = new Kafka({
       clientId: 'customer-frontend',
-      brokers: [process.env.REACT_APP_KAFKA_BROKERS || 'kafka-service:9092'],
+      brokers: [process.env.REACT_APP_KAFKA_BROKERS || 'localhost:9092'],
       retry: {
         initialRetryTime: 100,
         retries: 8
