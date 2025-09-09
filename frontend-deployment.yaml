@@ -24,9 +24,9 @@ spec:
         - containerPort: 80
         env:
         - name: REACT_APP_API_URL
-          value: "http://localhost:3000/api"
+          value: "http://192.168.49.100:30080/api"
         - name: REACT_APP_KAFKA_BROKERS
-          value: "localhost:9092"
+          value: "192.168.49.100:30092"
         resources:
           requests:
             memory: "128Mi"

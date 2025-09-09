@@ -3,6 +3,9 @@
 # Local Development Setup with Minikube
 echo "🚀 Setting up Unity Stack for Local Development with Minikube..."
 
+# Configuration
+STATIC_IP="192.168.49.100"
+
 # Parse command line arguments
 PUSH_TO_GITHUB=false
 GITHUB_USERNAME=""
@@ -28,6 +31,10 @@ while [[ $# -gt 0 ]]; do
       VERSION="$2"
       shift 2
       ;;
+    --static-ip)
+      STATIC_IP="$2"
+      shift 2
+      ;;
     --restore-deployments)
       echo "🔄 Restoring deployment files to use local images..."
       if [ -f "api-server-deployment.yaml.bak" ]; then
@@ -47,6 +54,7 @@ while [[ $# -gt 0 ]]; do
       echo "  --push-github         Push images to GitHub Container Registry"
       echo "  --github-user         GitHub username (required with --push-github)"
       echo "  --version             Image version tag (default: latest)"
+      echo "  --static-ip           Static IP for Minikube (default: 192.168.49.100)"
       echo "  --restore-deployments Restore deployment files to use local images"
       echo "  -h, --help            Show this help message"
       echo ""
@@ -70,6 +78,8 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+echo "📋 Using static IP: $STATIC_IP"
 
 # Validate Docker Hub push parameters
 if [ "$PUSH_TO_GITHUB" = true ]; then
@@ -142,7 +152,7 @@ else
         while [ $attempt -le $max_attempts ]; do
             echo "🚀 Starting Minikube (attempt $attempt/$max_attempts)..."
             
-            if minikube start --memory=4096 --cpus=2 --driver=docker; then
+            if minikube start --memory=4096 --cpus=2 --driver=docker --static-ip=$STATIC_IP; then
                 echo "✅ Minikube started successfully"
                 return 0
             else
