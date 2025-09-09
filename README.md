@@ -320,6 +320,170 @@ The API server connects to Kafka using the following configuration:
 
 Visit `http://localhost:3000/api` for complete API documentation with all available endpoints.
 
+## 🧪 Kafka Integration Testing
+
+### Testing Kafka Connectivity
+
+1. **Check Kafka Topics:**
+   ```bash
+   # List all available topics
+   kubectl exec -it kafka-58b74bd6b-k62ph -- kafka-topics --bootstrap-server localhost:9092 --list
+   ```
+
+2. **Test Kafka Producer (from API):**
+   ```bash
+   # Create a user to trigger Kafka message
+   curl -X POST http://192.168.49.100:30080/api/users \
+     -H "Content-Type: application/json" \
+     -d '{"name": "Kafka Test User", "email": "kafka@test.com", "age": 25}'
+   ```
+
+3. **Test Kafka Consumer (view messages):**
+   ```bash
+   # View user-events messages
+   kubectl exec -it kafka-58b74bd6b-k62ph -- kafka-console-consumer \
+     --bootstrap-server localhost:9092 \
+     --topic user-events \
+     --from-beginning \
+     --max-messages 5
+   ```
+
+4. **Test Product Events:**
+   ```bash
+   # Create a product to trigger Kafka message
+   curl -X POST http://192.168.49.100:30080/api/products \
+     -H "Content-Type: application/json" \
+     -d '{"name": "Test Product", "description": "Kafka test product", "price": 99.99, "category": "electronics", "quantity": 5}'
+   
+   # View product-events messages
+   kubectl exec -it kafka-58b74bd6b-k62ph -- kafka-console-consumer \
+     --bootstrap-server localhost:9092 \
+     --topic product-events \
+     --from-beginning \
+     --max-messages 5
+   ```
+
+5. **Test Order Events:**
+   ```bash
+   # Create an order to trigger Kafka message
+   curl -X POST http://192.168.49.100:30080/api/orders \
+     -H "Content-Type: application/json" \
+     -d '{
+       "userId": "68c0520a32840da5acefde60",
+       "products": [{"productId": "product-id", "quantity": 2, "price": 99.99}],
+       "totalAmount": 199.98,
+       "shippingAddress": {
+         "street": "123 Test St",
+         "city": "Test City",
+         "state": "TS",
+         "zipCode": "12345",
+         "country": "USA"
+       }
+     }'
+   
+   # View order-events messages
+   kubectl exec -it kafka-58b74bd6b-k62ph -- kafka-console-consumer \
+     --bootstrap-server localhost:9092 \
+     --topic order-events \
+     --from-beginning \
+     --max-messages 5
+   ```
+
+### Kafka Health Verification
+
+1. **Check API Server Kafka Status:**
+   ```bash
+   curl -s http://192.168.49.100:30080/health | jq .kafka
+   ```
+
+2. **Expected Response:**
+   ```json
+   {
+     "connected": true,
+     "consumerRunning": true
+   }
+   ```
+
+3. **Test Kafka Connection from Frontend:**
+   ```bash
+   # Check if frontend can reach Kafka NodePort
+   nc -zv 192.168.49.100 30092
+   ```
+
+### Kafka Topic Management
+
+1. **Describe Topic Details:**
+   ```bash
+   kubectl exec -it kafka-58b74bd6b-k62ph -- kafka-topics \
+     --bootstrap-server localhost:9092 \
+     --describe \
+     --topic user-events
+   ```
+
+2. **Check Topic Partitions:**
+   ```bash
+   kubectl exec -it kafka-58b74bd6b-k62ph -- kafka-topics \
+     --bootstrap-server localhost:9092 \
+     --describe \
+     --topic user-events \
+     --partitions
+   ```
+
+3. **Monitor Consumer Groups:**
+   ```bash
+   kubectl exec -it kafka-58b74bd6b-k62ph -- kafka-consumer-groups \
+     --bootstrap-server localhost:9092 \
+     --list
+   ```
+
+### Frontend Kafka Integration Test
+
+1. **Access Frontend:**
+   - URL: `http://192.168.49.100:30081`
+   - Check Kafka connection status in the UI
+
+2. **Test Kafka Producer from Frontend:**
+   - Use the frontend interface to send messages
+   - Verify messages appear in Kafka topics
+
+3. **Clear Browser Cache (if needed):**
+   - Hard refresh: `Ctrl+F5` or `Cmd+Shift+R`
+   - Clear cache in browser settings
+   - Check if Kafka connection status updates
+
+### Troubleshooting Kafka Issues
+
+1. **Kafka Pod Not Running:**
+   ```bash
+   kubectl get pods -l app=kafka
+   kubectl describe pod -l app=kafka
+   ```
+
+2. **Kafka Service Issues:**
+   ```bash
+   kubectl get services | grep kafka
+   kubectl describe service kafka-service
+   ```
+
+3. **Network Connectivity:**
+   ```bash
+   # Test internal connection
+   kubectl exec -it kafka-58b74bd6b-k62ph -- nc -zv kafka-service 9092
+   
+   # Test external connection
+   nc -zv 192.168.49.100 30092
+   ```
+
+4. **Check Kafka Logs:**
+   ```bash
+   kubectl logs -l app=kafka --tail=50
+   ```
+
+5. **API Server Kafka Connection:**
+   ```bash
+   kubectl logs -l app=api-server | grep -i kafka
+   ```
+
 ## 🔍 Monitoring and Logs
 
 ### Health Checks

@@ -41,7 +41,7 @@ spec:
         - name: API_RATE_LIMIT_WINDOW_MS
           value: "900000"
         - name: API_RATE_LIMIT_MAX_REQUESTS
-          value: "100"
+          value: "1000"
         resources:
           requests:
             memory: "256Mi"
