@@ -320,6 +320,153 @@ The API server connects to Kafka using the following configuration:
 
 Visit `http://localhost:3000/api` for complete API documentation with all available endpoints.
 
+## 🛒 Core API Examples
+
+### Essential User-Product Operations
+
+The API provides three core functions for managing users and their product purchases:
+
+#### 1. **Add User**
+Create a new user in the system:
+
+```bash
+curl -X POST http://192.168.49.100:30080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Demo User", "email": "demo@example.com", "age": 28}'
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User created successfully",
+  "data": {
+    "name": "Demo User",
+    "email": "demo@example.com",
+    "age": 28,
+    "isActive": true,
+    "_id": "68c056c332840da5acefde7f",
+    "createdAt": "2025-09-09T16:33:07.552Z",
+    "updatedAt": "2025-09-09T16:33:07.552Z",
+    "__v": 0,
+    "fullInfo": "Demo User (demo@example.com) - Active",
+    "id": "68c056c332840da5acefde7f"
+  }
+}
+```
+
+#### 2. **Add Product to User (Buy)**
+Associate a product with a user by creating an order:
+
+```bash
+curl -X POST http://192.168.49.100:30080/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "68c056c332840da5acefde7f",
+    "products": [{"productId": "68c0554632840da5acefde73", "quantity": 1, "price": 1299.99}],
+    "totalAmount": 1299.99,
+    "shippingAddress": {
+      "street": "456 Demo St",
+      "city": "Demo City",
+      "state": "DC",
+      "zipCode": "54321",
+      "country": "USA"
+    }
+  }'
+```
+
+**What happens:**
+- Creates an order for the user
+- Associates the product with the user
+- Tracks quantity and price
+- Stores shipping information
+- Updates product stock automatically
+
+#### 3. **List User Products**
+Get all products purchased by a specific user:
+
+```bash
+curl "http://192.168.49.100:30080/api/orders?userId=68c056c332840da5acefde7f"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Orders retrieved successfully",
+  "data": [
+    {
+      "_id": "68c056d432840da5acefde82",
+      "userId": {
+        "_id": "68c056c332840da5acefde7f",
+        "name": "Demo User",
+        "email": "demo@example.com"
+      },
+      "products": [
+        {
+          "productId": {
+            "_id": "68c0554632840da5acefde73",
+            "name": "MacBook Air",
+            "price": 1299.99
+          },
+          "quantity": 1,
+          "price": 1299.99
+        }
+      ],
+      "totalAmount": 1299.99,
+      "status": "pending",
+      "createdAt": "2025-09-09T16:33:24.176Z"
+    }
+  ],
+  "pagination": {
+    "total": 1,
+    "totalPages": null
+  }
+}
+```
+
+### Complete Example Flow
+
+Here's a complete example showing all three operations:
+
+```bash
+# 1. Create a user
+USER_RESPONSE=$(curl -s -X POST http://192.168.49.100:30080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name": "John Smith", "email": "john@example.com", "age": 35}')
+
+# Extract user ID from response
+USER_ID=$(echo $USER_RESPONSE | jq -r '.data._id')
+
+# 2. Add a product to the user (buy)
+curl -X POST http://192.168.49.100:30080/api/orders \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"userId\": \"$USER_ID\",
+    \"products\": [{\"productId\": \"68c0553832840da5acefde71\", \"quantity\": 2, \"price\": 999.99}],
+    \"totalAmount\": 1999.98,
+    \"shippingAddress\": {
+      \"street\": \"123 Main St\",
+      \"city\": \"Anytown\",
+      \"state\": \"CA\",
+      \"zipCode\": \"12345\",
+      \"country\": \"USA\"
+    }
+  }"
+
+# 3. List all products for this user
+curl "http://192.168.49.100:30080/api/orders?userId=$USER_ID"
+```
+
+### Key Features
+
+- **JSON Format**: All requests and responses use JSON
+- **Automatic Validation**: Input validation and error handling
+- **Stock Management**: Product quantities are automatically updated
+- **Complete History**: Full purchase history with timestamps
+- **Flexible Queries**: Support for pagination and filtering
+- **Real-time Updates**: Changes are immediately reflected in the database
+
 ## 🧪 Kafka Integration Testing
 
 ### Testing Kafka Connectivity

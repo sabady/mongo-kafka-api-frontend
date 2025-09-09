@@ -3,6 +3,7 @@ import userRoutes from './users';
 import productRoutes from './products';
 import orderRoutes from './orders';
 import healthRoutes from './health';
+import purchaseRoutes from './purchases';
 
 const router = Router();
 
@@ -11,6 +12,7 @@ router.use('/users', userRoutes);
 router.use('/products', productRoutes);
 router.use('/orders', orderRoutes);
 router.use('/health', healthRoutes);
+router.use('/purchases', purchaseRoutes);
 
 // API info endpoint
 router.get('/', (req, res) => {
@@ -22,7 +24,8 @@ router.get('/', (req, res) => {
       users: '/api/users',
       products: '/api/products',
       orders: '/api/orders',
-      health: '/api/health'
+      health: '/api/health',
+      purchases: '/api/purchases'
     },
     documentation: {
       users: {
@@ -60,6 +63,11 @@ router.get('/', (req, res) => {
       health: {
         'GET /api/health': 'Basic health check',
         'GET /api/health/detailed': 'Detailed health check with database test'
+      },
+      purchases: {
+        'POST /api/purchases/buy': 'Buy a product for a user',
+        'GET /api/purchases/user/:userId': 'Get all purchases made by a user',
+        'GET /api/purchases/user/:userId/products': 'Get all products purchased by a user'
       }
     }
   });
