@@ -113,3 +113,36 @@ memory-test-results/
 # Temporary files
 tmp/
 temp/
+
+# Development & Debugging Scripts (temporary)
+fix-api-server.sh
+diagnose-api-server.sh
+test-health-endpoint.sh
+dev-test.sh
+test-minikube.sh
+fix-docker-permissions.sh
+
+# Image & Registry Testing Scripts (one-time setup)
+check-images-exist.sh
+verify-deployments.sh
+test-image-pull.sh
+test-secret.sh
+create-ghcr-secret.sh
+check-token.sh
+test-ghcr-auth.sh
+docker-hub-commands.sh
+login-minikube-docker.sh
+push-images-to-github.sh
+
+# GitHub/CI/CD Scripts (development workflow)
+post-merge-cleanup.sh
+enable-auto-merge.sh
+create-consolidated-pr.sh
+pr-status.sh
+consolidate-prs.sh
+test-branch-protection.sh
+setup-branch-protection.sh
+
+# Setup Scripts (one-time setup)
+setup-storage.sh
+rebuild-api-server.sh
