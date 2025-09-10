@@ -5,8 +5,8 @@
 /api-server/ @sabady
 /src/ @sabady
 /package.json @sabady
-/tsconfig.json @sabady
-/Dockerfile @sabady
+/config/build/tsconfig.json @sabady
+/config/docker/Dockerfile @sabady
 
 # Frontend specific files
 /frontend/ @sabady
@@ -29,7 +29,7 @@
 *.sh @sabady
 
 # Docker and deployment
-Dockerfile* @sabady
+config/docker/Dockerfile* @sabady
 docker-compose* @sabady
 .dockerignore @sabady
 

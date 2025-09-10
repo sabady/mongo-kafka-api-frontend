@@ -22,7 +22,7 @@ A comprehensive Node.js TypeScript API server that provides CRUD operations for 
 ## 📁 Project Structure
 
 ```
-├── src/
+├── src/                 # Source code
 │   ├── config/          # Database and Kafka configuration
 │   ├── models/          # Mongoose models (User, Product, Order)
 │   ├── routes/          # Express routes and API endpoints
@@ -31,13 +31,64 @@ A comprehensive Node.js TypeScript API server that provides CRUD operations for 
 │   ├── utils/           # Kafka producer utilities
 │   ├── types/           # TypeScript interfaces and types
 │   └── server.ts        # Main application entry point
-├── mongodb-*.yaml       # MongoDB Kubernetes manifests
-├── kafka-*.yaml         # Kafka Kubernetes manifests
-├── api-server-*.yaml    # API server Kubernetes manifests
-├── Dockerfile           # Container configuration
+├── k8s/                 # Kubernetes manifests organized by service
+│   ├── mongodb/         # MongoDB deployment files
+│   ├── kafka/           # Kafka deployment files
+│   ├── api-server/      # API server deployment files
+│   ├── frontend/        # Frontend deployment files
+│   ├── monitoring/      # Monitoring and metrics files
+│   └── secrets/         # Secret management files
+├── scripts/             # Shell scripts organized by purpose
+│   ├── deploy/          # Deployment scripts
+│   ├── dev/             # Development and debugging scripts
+│   ├── test/            # Testing and verification scripts
+│   └── setup/           # Setup and configuration scripts
+├── docs/                # Documentation organized by purpose
+│   ├── setup/           # Setup and configuration documentation
+│   ├── deployment/      # Deployment and operations documentation
+│   └── development/     # Development and local setup documentation
+├── config/              # Configuration files organized by purpose
+│   ├── build/           # Build configuration files
+│   │   ├── tsconfig.json # TypeScript configuration
+│   │   └── jest.config.js # Jest testing configuration
+│   ├── docker/          # Docker configuration
+│   │   └── Dockerfile   # Container configuration
+│   ├── ci/              # CI/CD configuration
+│   │   └── CODEOWNERS   # Code ownership rules
+│   ├── env.example      # Environment variables template
+│   └── load-test.yml    # Load testing configuration
+├── tests/               # Test files organized by type
+│   ├── unit/            # Unit tests
+│   └── integration/     # Integration tests
+├── frontend/            # Frontend application code
+├── run-local-minikube.sh # Main deployment script
+├── stop-local-minikube.sh # Cleanup script
 ├── package.json         # Dependencies and scripts
-└── tsconfig.json        # TypeScript configuration
+└── README.md            # Main project documentation
 ```
+
+### 📂 File Organization Guide
+
+- **Kubernetes Manifests**: All `.yaml` files are in `k8s/` organized by service
+- **Shell Scripts**: All `.sh` files are in `scripts/` organized by purpose
+- **Documentation**: All `.md` files are in `docs/` organized by topic
+- **Configuration**: Environment and config files are in `config/`
+- **Tests**: Test files are in `tests/` organized by type
+- **Source Code**: Application code remains in `src/` and `frontend/`
+
+### 🔍 Quick File Finder
+
+- **Deploy MongoDB**: `scripts/deploy/deploy-mongodb.sh`
+- **Kafka Config**: `k8s/kafka/kafka-configmap.yaml`
+- **API Server**: `k8s/api-server/api-server-deployment.yaml`
+- **Environment Setup**: `config/env.example`
+- **Load Testing**: `config/load-test.yml`
+- **TypeScript Config**: `config/build/tsconfig.json`
+- **Jest Config**: `config/build/jest.config.js`
+- **Dockerfile**: `config/docker/Dockerfile`
+- **Code Owners**: `config/ci/CODEOWNERS`
+- **Setup Docs**: `docs/setup/`
+- **Deployment Docs**: `docs/deployment/`
 
 ## 🛠️ API Endpoints
 
@@ -175,24 +226,24 @@ See [README-LOCAL.md](README-LOCAL.md) for detailed local development instructio
 
 #### Option 1: Deploy Complete Stack (Recommended)
 ```bash
-./deploy-all.sh
+./scripts/deploy/deploy-all.sh
 ```
 
 #### Option 2: Deploy Components Individually
 
 1. **Deploy MongoDB:**
    ```bash
-   ./deploy-mongodb.sh
+   ./scripts/deploy/deploy-mongodb.sh
    ```
 
 2. **Deploy Kafka:**
    ```bash
-   ./deploy-kafka.sh
+   ./scripts/deploy/deploy-kafka.sh
    ```
 
 3. **Deploy the API server:**
    ```bash
-   ./deploy-api-server.sh
+   ./scripts/deploy/deploy-api-server.sh
    ```
 
 #### Access Information
@@ -320,7 +371,7 @@ The API server connects to Kafka using the following configuration:
 
 Visit `http://localhost:3000/api` for complete API documentation with all available endpoints.
 
-## 🛒 Core API Examples
+th## 🛒 Core API Examples
 
 ### Essential User-Product Operations
 
@@ -751,18 +802,18 @@ This directory also contains a complete Kubernetes deployment for MongoDB with p
 
 1. **Automated deployment** (recommended):
    ```bash
-   chmod +x deploy-mongodb.sh
-   ./deploy-mongodb.sh
+   chmod +x scripts/deploy/deploy-mongodb.sh
+   ./scripts/deploy/deploy-mongodb.sh
    ```
 
 2. **Manual deployment**:
    ```bash
-   kubectl apply -f mongodb-configmap.yaml
-   kubectl apply -f mongodb-secret.yaml
-   kubectl apply -f mongodb-pvc.yaml
-   kubectl apply -f mongodb-deployment.yaml
-   kubectl apply -f mongodb-service.yaml
-   kubectl apply -f mongodb-test-pod.yaml
+   kubectl apply -f k8s/mongodb/mongodb-configmap.yaml
+   kubectl apply -f k8s/mongodb/mongodb-secret.yaml
+   kubectl apply -f k8s/mongodb/mongodb-pvc.yaml
+   kubectl apply -f k8s/mongodb/mongodb-deployment.yaml
+   kubectl apply -f k8s/mongodb/mongodb-service.yaml
+   kubectl apply -f k8s/mongodb/mongodb-test-pod.yaml
    ```
 
 ### MongoDB Configuration Details

@@ -36,7 +36,7 @@ fi
 echo "📦 Applying Kubernetes manifests..."
 
 # Deploy the frontend
-kubectl apply -f frontend-deployment.yaml
+kubectl apply -f k8s/frontend/frontend-deployment.yaml
 if [ $? -eq 0 ]; then
     echo "✅ Frontend deployment applied"
 else
@@ -45,7 +45,7 @@ else
 fi
 
 # Deploy the service
-kubectl apply -f frontend-service.yaml
+kubectl apply -f k8s/frontend/frontend-service.yaml
 if [ $? -eq 0 ]; then
     echo "✅ Frontend service applied"
 else
@@ -54,8 +54,8 @@ else
 fi
 
 # Deploy the ingress (optional)
-if [ -f "frontend-ingress.yaml" ]; then
-    kubectl apply -f frontend-ingress.yaml
+if [ -f "k8s/frontend/frontend-ingress.yaml" ]; then
+    kubectl apply -f k8s/frontend/frontend-ingress.yaml
     if [ $? -eq 0 ]; then
         echo "✅ Frontend ingress applied"
     else
@@ -85,16 +85,16 @@ echo "📋 Pod Information:"
 kubectl get pods -l app=frontend
 
 # Get ingress information (if available)
-if kubectl get ingress frontend-ingress &> /dev/null; then
+if kubectl get ingress k8s/frontend/frontend-ingress &> /dev/null; then
     echo "📋 Ingress Information:"
-    kubectl get ingress frontend-ingress
+    kubectl get ingress k8s/frontend/frontend-ingress
 fi
 
 echo ""
 echo "🎉 Frontend deployment completed successfully!"
 echo ""
 echo "📡 Access Information:"
-echo "  - ClusterIP Service: frontend-service:80"
+echo "  - ClusterIP Service: k8s/frontend/frontend-service:80"
 echo "  - NodePort Service: <node-ip>:30080"
 echo "  - Health Check: http://<node-ip>:30080/health"
 echo "  - Frontend Application: http://<node-ip>:30080"

@@ -37,12 +37,12 @@ while [[ $# -gt 0 ]]; do
       ;;
     --restore-deployments)
       echo "🔄 Restoring deployment files to use local images..."
-      if [ -f "api-server-deployment.yaml.bak" ]; then
-          mv api-server-deployment.yaml.bak api-server-deployment.yaml
+      if [ -f "k8s/api-server/api-server-deployment.yaml.bak" ]; then
+          mv k8s/api-server/api-server-deployment.yaml.bak k8s/api-server/api-server-deployment.yaml
           echo "✅ Restored api-server-deployment.yaml"
       fi
-      if [ -f "frontend-deployment.yaml.bak" ]; then
-          mv frontend-deployment.yaml.bak frontend-deployment.yaml
+      if [ -f "k8s/frontend/frontend-deployment.yaml.bak" ]; then
+          mv k8s/frontend/frontend-deployment.yaml.bak k8s/frontend/frontend-deployment.yaml
           echo "✅ Restored frontend-deployment.yaml"
       fi
       echo "📋 Deployment files restored to use local images"
@@ -328,7 +328,7 @@ EOF
         # Encode and create secret
         DOCKER_CONFIG_B64=$(echo "$DOCKER_CONFIG" | base64 -w 0)
         
-        cat > ghcr-secret.yaml <<EOF
+        cat > k8s/secrets/ghcr-secret.yaml <<EOF
 apiVersion: v1
 kind: Secret
 metadata:
@@ -340,7 +340,7 @@ data:
 EOF
         
         # Apply the secret
-        kubectl apply -f ghcr-secret.yaml
+        kubectl apply -f k8s/secrets/ghcr-secret.yaml
         echo "✅ GitHub Container Registry secret created"
     else
         echo "⚠️ No .docker-hub-token file found, skipping secret creation"
@@ -444,14 +444,14 @@ EOF
     echo "📝 Updating deployment files to use GitHub Container Registry images..."
     
     # Update API Server deployment
-    if [ -f "api-server-deployment.yaml" ]; then
-        sed -i.bak "s|image: api-server:latest|image: $REGISTRY/$REPOSITORY/$API_IMAGE_NAME:$VERSION|g" api-server-deployment.yaml
+    if [ -f "k8s/api-server/api-server-deployment.yaml" ]; then
+        sed -i.bak "s|image: api-server:latest|image: $REGISTRY/$REPOSITORY/$API_IMAGE_NAME:$VERSION|g" k8s/api-server/api-server-deployment.yaml
         echo "✅ Updated api-server-deployment.yaml"
     fi
     
     # Update Frontend deployment
-    if [ -f "frontend-deployment.yaml" ]; then
-        sed -i.bak "s|image: customer-frontend:latest|image: $REGISTRY/$REPOSITORY/$FRONTEND_IMAGE_NAME:$VERSION|g" frontend-deployment.yaml
+    if [ -f "k8s/frontend/frontend-deployment.yaml" ]; then
+        sed -i.bak "s|image: customer-frontend:latest|image: $REGISTRY/$REPOSITORY/$FRONTEND_IMAGE_NAME:$VERSION|g" k8s/frontend/frontend-deployment.yaml
         echo "✅ Updated frontend-deployment.yaml"
     fi
     
@@ -461,11 +461,11 @@ fi
 
 # Deploy MongoDB
 echo "📊 Deploying MongoDB..."
-kubectl apply -f mongodb-configmap.yaml
-kubectl apply -f mongodb-secret.yaml
-kubectl apply -f mongodb-pvc.yaml
-kubectl apply -f mongodb-deployment.yaml
-kubectl apply -f mongodb-service.yaml
+kubectl apply -f k8s/mongodb/mongodb-configmap.yaml
+kubectl apply -f k8s/mongodb/mongodb-secret.yaml
+kubectl apply -f k8s/mongodb/mongodb-pvc.yaml
+kubectl apply -f k8s/mongodb/mongodb-deployment.yaml
+kubectl apply -f k8s/mongodb/mongodb-service.yaml
 
 # Wait for MongoDB to be ready
 echo "⏳ Waiting for MongoDB to be ready..."
@@ -473,10 +473,10 @@ kubectl wait --for=condition=available --timeout=300s deployment/mongodb
 
 # Deploy Kafka
 echo "📨 Deploying Kafka..."
-kubectl apply -f kafka-configmap.yaml
-kubectl apply -f kafka-pvc.yaml
-kubectl apply -f kafka-deployment.yaml
-kubectl apply -f kafka-service.yaml
+kubectl apply -f k8s/kafka/kafka-configmap.yaml
+kubectl apply -f k8s/kafka/kafka-pvc.yaml
+kubectl apply -f k8s/kafka/kafka-deployment.yaml
+kubectl apply -f k8s/kafka/kafka-service.yaml
 
 # Wait for Kafka to be ready
 echo "⏳ Waiting for Kafka to be ready..."
@@ -484,14 +484,14 @@ kubectl wait --for=condition=available --timeout=300s deployment/kafka
 
 # Create Kafka topics
 echo "📋 Creating Kafka topics..."
-kubectl apply -f kafka-topics.yaml
-kubectl apply -f kafka-topic-creator.yaml
+kubectl apply -f k8s/kafka/kafka-topics.yaml
+kubectl apply -f k8s/kafka/kafka-topic-creator.yaml
 kubectl wait --for=condition=complete --timeout=120s job/kafka-topic-creator
 
 # Deploy API Server
 echo "🔌 Deploying API Server..."
-kubectl apply -f api-server-deployment.yaml
-kubectl apply -f api-server-service.yaml
+kubectl apply -f k8s/api-server/api-server-deployment.yaml
+kubectl apply -f k8s/api-server/api-server-service.yaml
 
 # Wait for API Server to be ready
 echo "⏳ Waiting for API Server to be ready..."
@@ -499,8 +499,8 @@ kubectl wait --for=condition=available --timeout=300s deployment/api-server
 
 # Deploy Frontend
 echo "🎨 Deploying Frontend..."
-kubectl apply -f frontend-deployment.yaml
-kubectl apply -f frontend-service.yaml
+kubectl apply -f k8s/frontend/frontend-deployment.yaml
+kubectl apply -f k8s/frontend/frontend-service.yaml
 
 # Wait for Frontend to be ready
 echo "⏳ Waiting for Frontend to be ready..."
@@ -508,7 +508,7 @@ kubectl wait --for=condition=available --timeout=300s deployment/frontend
 
 # Deploy Metrics Server
 echo "📈 Deploying Metrics Server..."
-kubectl apply -f metrics-server.yaml
+kubectl apply -f k8s/monitoring/metrics-server.yaml
 
 # Wait for metrics server to be ready
 echo "⏳ Waiting for metrics server to be ready..."
@@ -516,10 +516,10 @@ kubectl wait --for=condition=available --timeout=300s deployment/metrics-server 
 
 # Deploy Autoscaling
 echo "📊 Deploying Autoscaling..."
-kubectl apply -f api-server-hpa.yaml
-kubectl apply -f frontend-hpa.yaml
-kubectl apply -f kafka-hpa.yaml
-kubectl apply -f mongodb-hpa.yaml
+kubectl apply -f k8s/api-server/api-server-hpa.yaml
+kubectl apply -f k8s/frontend/frontend-hpa.yaml
+kubectl apply -f k8s/kafka/kafka-hpa.yaml
+kubectl apply -f k8s/mongodb/mongodb-hpa.yaml
 
 # Get service URLs
 echo "🔗 Getting service URLs..."

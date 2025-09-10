@@ -19,7 +19,7 @@ echo "✅ Kubernetes cluster connection verified"
 
 # Deploy Metrics Server
 echo "📊 Deploying Metrics Server..."
-kubectl apply -f metrics-server.yaml
+kubectl apply -f k8s/monitoring/metrics-server.yaml
 if [ $? -eq 0 ]; then
     echo "✅ Metrics Server deployed"
 else
@@ -43,7 +43,7 @@ fi
 # Deploy Horizontal Pod Autoscalers
 echo "📈 Deploying Horizontal Pod Autoscalers..."
 
-kubectl apply -f api-server-hpa.yaml
+kubectl apply -f k8s/api-server/api-server-hpa.yaml
 if [ $? -eq 0 ]; then
     echo "✅ API Server HPA deployed"
 else
@@ -51,7 +51,7 @@ else
     exit 1
 fi
 
-kubectl apply -f frontend-hpa.yaml
+kubectl apply -f k8s/frontend/frontend-hpa.yaml
 if [ $? -eq 0 ]; then
     echo "✅ Frontend HPA deployed"
 else
@@ -59,7 +59,7 @@ else
     exit 1
 fi
 
-kubectl apply -f kafka-hpa.yaml
+kubectl apply -f k8s/kafka/kafka-hpa.yaml
 if [ $? -eq 0 ]; then
     echo "✅ Kafka HPA deployed"
 else
@@ -67,7 +67,7 @@ else
     exit 1
 fi
 
-kubectl apply -f mongodb-hpa.yaml
+kubectl apply -f k8s/mongodb/mongodb-hpa.yaml
 if [ $? -eq 0 ]; then
     echo "✅ MongoDB HPA deployed"
 else
@@ -80,10 +80,10 @@ echo "📊 Checking for VPA installation..."
 if kubectl get crd verticalpodautoscalers.autoscaling.k8s.io &> /dev/null; then
     echo "✅ VPA is installed, deploying VPA resources..."
     
-    kubectl apply -f api-server-hpa.yaml
-    kubectl apply -f frontend-hpa.yaml
-    kubectl apply -f kafka-hpa.yaml
-    kubectl apply -f mongodb-hpa.yaml
+    kubectl apply -f k8s/api-server/api-server-hpa.yaml
+    kubectl apply -f k8s/frontend/frontend-hpa.yaml
+    kubectl apply -f k8s/kafka/kafka-hpa.yaml
+    kubectl apply -f k8s/mongodb/mongodb-hpa.yaml
     
     echo "✅ VPA resources deployed"
 else

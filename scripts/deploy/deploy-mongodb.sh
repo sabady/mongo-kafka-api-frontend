@@ -23,25 +23,25 @@ echo "✅ Kubernetes cluster is accessible"
 
 # Apply configurations in order
 echo "📝 Creating ConfigMap..."
-kubectl apply -f mongodb-configmap.yaml
+kubectl apply -f k8s/mongodb/mongodb-configmap.yaml
 
 echo "🔐 Creating Secret..."
-kubectl apply -f mongodb-secret.yaml
+kubectl apply -f k8s/mongodb/mongodb-secret.yaml
 
 echo "💾 Creating PersistentVolumeClaim..."
-kubectl apply -f mongodb-pvc.yaml
+kubectl apply -f k8s/mongodb/mongodb-pvc.yaml
 
 echo "🚀 Deploying MongoDB..."
-kubectl apply -f mongodb-deployment.yaml
+kubectl apply -f k8s/mongodb/mongodb-deployment.yaml
 
 echo "🌐 Creating Services..."
-kubectl apply -f mongodb-service.yaml
+kubectl apply -f k8s/mongodb/mongodb-service.yaml
 
 echo "⏳ Waiting for MongoDB to be ready..."
 kubectl wait --for=condition=available --timeout=300s deployment/mongodb
 
 echo "🧪 Creating test pod..."
-kubectl apply -f mongodb-test-pod.yaml
+kubectl apply -f k8s/mongodb/mongodb-test-pod.yaml
 
 echo "✅ MongoDB deployment completed successfully!"
 echo ""
@@ -52,11 +52,11 @@ kubectl get pvc
 
 echo ""
 echo "🔗 Connection Information:"
-echo "Internal cluster access: mongodb-service:27017"
+echo "Internal cluster access: k8s/mongodb/mongodb-service:27017"
 echo "External access (NodePort): <node-ip>:30017"
 echo ""
 echo "🧪 To test the connection:"
-echo "kubectl exec -it mongodb-test -- mongosh mongodb://admin:admin123@mongodb-service:27017/admin"
+echo "kubectl exec -it k8s/mongodb/mongodb-test -- mongosh mongodb://admin:admin123@k8s/mongodb/mongodb-service:27017/admin"
 echo ""
 echo "📋 To view logs:"
 echo "kubectl logs -l app=mongodb"

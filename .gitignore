@@ -146,3 +146,18 @@ setup-branch-protection.sh
 # Setup Scripts (one-time setup)
 setup-storage.sh
 rebuild-api-server.sh
+
+# Backup files (not needed with version control)
+*.bak
+*.backup
+*.orig
+
+# Organized folder structure
+# k8s/ - Kubernetes YAML files organized by service
+# scripts/ - Shell scripts organized by purpose
+# docs/ - Documentation organized by topic
+# config/ - Configuration files organized by purpose
+#   config/build/ - Build configuration (tsconfig.json, jest.config.js)
+#   config/docker/ - Docker configuration (Dockerfile)
+#   config/ci/ - CI/CD configuration (CODEOWNERS)
+# tests/ - Test files organized by type

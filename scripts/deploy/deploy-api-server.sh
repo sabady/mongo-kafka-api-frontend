@@ -34,7 +34,7 @@ fi
 echo "📦 Applying Kubernetes manifests..."
 
 # Deploy the API server
-kubectl apply -f api-server-deployment.yaml
+kubectl apply -f k8s/api-server/api-server-deployment.yaml
 if [ $? -eq 0 ]; then
     echo "✅ API server deployment applied"
 else
@@ -43,7 +43,7 @@ else
 fi
 
 # Deploy the service
-kubectl apply -f api-server-service.yaml
+kubectl apply -f k8s/api-server/api-server-service.yaml
 if [ $? -eq 0 ]; then
     echo "✅ API server service applied"
 else
@@ -52,8 +52,8 @@ else
 fi
 
 # Deploy the ingress (optional)
-if [ -f "api-server-ingress.yaml" ]; then
-    kubectl apply -f api-server-ingress.yaml
+if [ -f "k8s/api-server/api-server-ingress.yaml" ]; then
+    kubectl apply -f k8s/api-server/api-server-ingress.yaml
     if [ $? -eq 0 ]; then
         echo "✅ API server ingress applied"
     else
@@ -83,16 +83,16 @@ echo "📋 Pod Information:"
 kubectl get pods -l app=api-server
 
 # Get ingress information (if available)
-if kubectl get ingress api-server-ingress &> /dev/null; then
+if kubectl get ingress k8s/api-server/api-server-ingress &> /dev/null; then
     echo "📋 Ingress Information:"
-    kubectl get ingress api-server-ingress
+    kubectl get ingress k8s/api-server/api-server-ingress
 fi
 
 echo ""
 echo "🎉 API Server with Kafka Consumer deployment completed successfully!"
 echo ""
 echo "📡 Access Information:"
-echo "  - ClusterIP Service: api-server-service:3000"
+echo "  - ClusterIP Service: k8s/api-server/api-server-service:3000"
 echo "  - NodePort Service: <node-ip>:30080"
 echo "  - Health Check: http://<node-ip>:30080/health"
 echo "  - API Documentation: http://<node-ip>:30080/api"
