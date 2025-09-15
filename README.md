@@ -172,10 +172,9 @@ This will:
 - Provide access URLs for all services
 
 **Access URLs:**
-- Frontend: `http://192.168.49.2:30080`
+- Frontend: `http://192.168.49.2:30081`
 - API Server: `http://192.168.49.2:30080/api`
 - Health Check: `http://192.168.49.2:30080/health`
-- Prometheus: `http://192.168.49.2:30090`
 - Minikube Dashboard: `minikube dashboard`
 
 See [README-LOCAL.md](README-LOCAL.md) for detailed local development instructions.
@@ -247,6 +246,7 @@ See [README-LOCAL.md](README-LOCAL.md) for detailed local development instructio
    ```
 
 #### Access Information
+- **Frontend**: `http://<node-ip>:30081`
 - **API Server**: `http://<node-ip>:30080`
 - **Health Check**: `http://<node-ip>:30080/health`
 - **API Documentation**: `http://<node-ip>:30080/api`
