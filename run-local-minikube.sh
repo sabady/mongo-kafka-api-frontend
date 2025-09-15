@@ -266,7 +266,7 @@ echo "🔨 Building Docker images..."
 
 # Build API Server image
 echo "📦 Building API Server image..."
-if docker build -t api-server:latest .; then
+if docker build -f config/docker/Dockerfile -t api-server:latest .; then
     echo "✅ API Server image built successfully"
 else
     echo "❌ Failed to build API Server image"
