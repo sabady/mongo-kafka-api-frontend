@@ -13,17 +13,21 @@ COPY package*.json ./
 # Install all dependencies (including dev dependencies for build)
 RUN npm install && npm cache clean --force
 
+# Create config directory structure
+RUN mkdir -p config/build
+
 # Copy build configuration
-COPY config/build/tsconfig.json ./
+COPY config/build/tsconfig.docker.json ./tsconfig.json
+COPY config/build/jest.config.js ./config/build/
 
 # Copy source code
 COPY src/ ./src/
 
 # Build TypeScript
-RUN npm run build
+RUN npx tsc
 
 # Remove dev dependencies and source files
-RUN npm prune --production && rm -rf src tsconfig.json
+RUN npm prune --production && rm -rf src config
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
