@@ -7,7 +7,7 @@ yarn-error.log*
 
 # Production builds
 dist/
-build/
+/build/
 frontend/build/
 
 # Environment variables
