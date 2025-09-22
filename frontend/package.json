@@ -14,7 +14,7 @@
     "web-vitals": "^5.1.0",
     "axios": "^1.6.2",
     "kafkajs": "^2.2.4",
-    "uuid": "^9.0.0",
+    "uuid": "^13.0.0",
     "@mui/material": "^5.15.0",
     "@mui/icons-material": "^5.15.0",
     "@emotion/react": "^11.11.1",
@@ -51,7 +51,7 @@
     ]
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.0"
+    "@types/uuid": "^11.0.0"
   },
   "proxy": "http://localhost:3000"
 }
